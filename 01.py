@@ -90,9 +90,14 @@ def create_ufo():
         c.create_oval(*window, fill='#ffffff', outline='#ffffff')
 
 def create_dodik():
-    pass
+    ovals = list()
+
+    ovals.append((473, 609, 473 + 27, 609 + 22))
+    ovals.append((479, 629, 479 + 21, 629 + 12))
 
 
+    for oval in ovals:
+        c.create_oval(*oval, fill='#dde9af', outline='#dde9af')
 
 
 
