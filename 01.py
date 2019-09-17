@@ -89,7 +89,8 @@ def create_ufo():
     for window in windows:
         c.create_oval(*window, fill='#ffffff', outline='#ffffff')
 
-
+def create_dodik():
+    pass
 
 
 
@@ -100,6 +101,7 @@ create_sun()
 create_clouds()
 create_ray()
 create_ufo()
+create_dodik()
 
 
 run()
