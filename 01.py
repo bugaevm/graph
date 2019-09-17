@@ -94,6 +94,8 @@ def create_dodik():
 
     ovals.append((473, 609, 473 + 27, 609 + 22))
     ovals.append((479, 629, 479 + 21, 629 + 12))
+    ovals.append((491, 642, 491 + 17, 642 + 20))
+    ovals.append((502, 661, 502 + 10, 661 + 15))
 
 
     for oval in ovals:
