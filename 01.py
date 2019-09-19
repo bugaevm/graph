@@ -1,4 +1,5 @@
 from graph import *
+from time import sleep
 
 c = canvas()
 
@@ -8,14 +9,36 @@ height = 1123
 windowSize(width, height)
 canvasSize(width, height)
 
+fps = 1 / 60
+
+class UFO:
+    def __init__(self, *args):
+        self.content = list(args)
+
+class Ray:
+    def __init__(self, down, horizon, top):
+        self.top = top
+        self.horizon = horizon
+        self.down = down
+
+
+def html_col(col):
+    r, g, b = col
+
+    r = ('0' + hex(r)[2:])[-2:]
+    g = ('0' + hex(g)[2:])[-2:]
+    b = ('0' + hex(b)[2:])[-2:]
+
+    return '#' + r + g + b
+
 def create_background():
-    penColor('#2e4544')
-    brushColor('#00222b')
+    penColor(horizon_col)
+    brushColor(sky_col)
     penSize(1)
 
     rectangle(-1, -1, width + 1, 576)
 
-    brushColor('#222b00')
+    brushColor(ground_col)
     rectangle(-1, 576 + 1, width + 1, height + 1)
 
 
@@ -47,6 +70,8 @@ def create_clouds():
 
 
 def create_ray():
+    global ray
+
     down = list()
     top = list()
 
@@ -61,19 +86,25 @@ def create_ray():
     top.append((128, 507))
 
 
-    penColor('#7d836a')
-    brushColor('#7d836a')
-    polygon(down)
+    penColor(ray_ground_col)
+    brushColor(ray_ground_col)
+    r_down = polygon(down)
 
-    penColor('#6a7d83')
-    brushColor('#6a7d83')
-    polygon(top)
+    penColor(ray_sky_col)
+    brushColor(ray_sky_col)
+    r_top = polygon(top)
 
-    penColor('#849291')
-    line(94, 576, 253, 576)
-    line(93, 577, 254, 577)
+    penColor(ray_horizon_col)
+    brushColor(ray_horizon_col)
+    r_hor = polygon([(94, 576), (253, 576), (254, 577), (93, 577)])
+
+    ray = Ray(r_down, r_hor, r_top)
 
 def create_ufo():
+    global ufo
+
+    ufo = UFO()
+
     windows = list()
 
     windows.append((24, 443, 24 + 41, 443 + 18))
@@ -83,11 +114,18 @@ def create_ufo():
     windows.append((247, 465, 247 + 41, 465 + 18))
     windows.append((303, 444, 303 + 41, 444 + 18))
 
-    c.create_oval(6, 393, 6 + 355, 393 + 117, fill='#999999', outline='#999999')
-    c.create_oval(56, 383, 56 + 256, 383 + 82, fill='#cccccc', outline='#cccccc')
+    ufo.content.append(c.create_oval(
+        6, 393, 6 + 355, 393 + 117, fill='#999999', outline='#999999'
+    ))
+
+    ufo.content.append(c.create_oval(
+        56, 383, 56 + 256, 383 + 82, fill='#cccccc', outline='#cccccc'
+    ))
 
     for window in windows:
-        c.create_oval(*window, fill='#ffffff', outline='#ffffff')
+        ufo.content.append(c.create_oval(
+            *window, fill='#ffffff', outline='#ffffff'
+        ))
 
 def create_dodik():
     body = (513, 761, 513 + 54, 761 + 117)
@@ -199,6 +237,94 @@ def create_apple():
     polygon(leave)
 
 
+def change_col(col1, col2, i, length):
+    r1, g1, b1 = col1
+    r2, g2, b2 = col2
+
+    r = r1 + int((r2 - r1) * (i + 1) / length + 0.5)
+    g = g1 + int((g2 - g1) * (i + 1) / length + 0.5)
+    b = b1 + int((b2 - b1) * (i + 1) / length + 0.5)
+
+    return html_col((r, g, b))
+
+
+sky_col = (0, 34, 43)  #00222b
+horizon_col = (46, 69, 68)  #2e4544
+ground_col = (34, 43, 0)  #222b00
+
+ray_sky_col = (106, 125, 131)  #6a7d83
+ray_horizon_col = (132, 146, 145)  #849291
+ray_ground_col = (125, 131, 106)  #7d836a
+
+def turn_off_ray(j):
+    changeFillColor(ray.top, change_col(ray_sky_col, sky_col, j, per))
+    changePenColor(ray.top, change_col(ray_sky_col, sky_col, j, per))
+
+    changeFillColor(ray.horizon, change_col(ray_horizon_col, horizon_col, j, per))
+    changePenColor(ray.horizon, change_col(ray_horizon_col, horizon_col, j, per))
+
+    changeFillColor(ray.down, change_col(ray_ground_col, ground_col, j, per))
+    changePenColor(ray.down, change_col(ray_ground_col, ground_col, j, per))
+
+def turn_on_ray(j):
+    changeFillColor(ray.top, change_col(sky_col, ray_sky_col, j, per))
+    changePenColor(ray.top, change_col(sky_col, ray_sky_col, j, per))
+
+    changeFillColor(ray.horizon, change_col(horizon_col, ray_horizon_col, j, per))
+    changePenColor(ray.horizon, change_col(horizon_col, ray_horizon_col, j, per))
+
+    changeFillColor(ray.down, change_col(ground_col, ray_ground_col, j, per))
+    changePenColor(ray.down, change_col(ground_col, ray_ground_col, j, per))
+
+i = 0
+per = int(1 / fps / 2)
+
+v = 0
+a = 0
+
+def animation():
+    global i, v, a
+
+    i += 1
+    i %= 15 * per
+
+    dy = v + a // 2
+    v += a
+
+    for obj in ufo.content:
+        moveObjectBy(obj, 0, -dy)
+
+    if i // per == 7:
+        turn_off_ray(i - 7 * per)
+
+    elif i == 8 * per:
+        changeFillColor(ray.top, html_col(sky_col))
+        changePenColor(ray.top, html_col(sky_col))
+
+        changeFillColor(ray.horizon, html_col(horizon_col))
+        changePenColor(ray.horizon, html_col(horizon_col))
+
+        changeFillColor(ray.down, html_col(ground_col))
+        changePenColor(ray.down, html_col(ground_col))
+
+    elif i // per == 9:
+        a = 3
+
+    elif i == 11 * per:
+        v = -v
+
+    elif i == int(13.24 * per):
+        a = 0
+        v = 0
+
+        for obj in ufo.content:
+            deleteObject(obj)
+
+        create_ufo()
+
+
+    elif i // per == 14:
+        turn_on_ray(i - 14 * per)
 
 
 
@@ -213,6 +339,8 @@ create_ray()
 create_ufo()
 create_dodik()
 create_apple()
+
+onTimer(animation, int(fps * 1000))
 
 
 run()
