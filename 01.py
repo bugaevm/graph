@@ -49,8 +49,8 @@ class Eye:
         moveObjectTo(self.obj, *self.pos2)
 
     def look(self, i, length):
-        size_x = (1 + i / length * 0.55) * self.size
-        size_y = (1 + i / length * 0.55) * self.size
+        size_x = (1 + i / length * 0.0) * self.size
+        size_y = (1 + i / length * 0.9) * self.size
 
         x = self.pos2[0] - (size_x - self.size) / 2 + 0.5
         y = self.pos2[1] - (size_y - self.size) / 2 + 0.5
