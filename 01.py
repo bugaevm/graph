@@ -21,6 +21,50 @@ class Ray:
         self.horizon = horizon
         self.down = down
 
+class Eye:
+    def __init__(self, obj, pos2, size):
+        self.obj = obj
+        self.pos1 = (xCoord(obj) + 1, yCoord(obj) + 1)
+        self.pos2 = pos2
+        self.size = size
+
+        self.looking = None
+
+    def move(self, v, i, length):
+        # beg = self.pos1 if v == 1 else self.pos2
+        # moveObjectTo(self.obj,
+        #     beg[0] + int(v * i * (self.pos2[0] - self.pos1[0]) / length + 0.5),
+        #     beg[1] + int(v * i * (self.pos2[1] - self.pos1[1]) / length + 0.5),
+        # )
+
+        moveObjectBy(self.obj,
+            v * (self.pos2[0] - self.pos1[0]) / length,
+            v * (self.pos2[1] - self.pos1[1]) / length,
+        )
+
+    def take_pos1(self):
+        moveObjectTo(self.obj, *self.pos1)
+
+    def take_pos2(self):
+        moveObjectTo(self.obj, *self.pos2)
+
+    def look(self, i, length):
+        size_x = (1 + i / length * 0.55) * self.size
+        size_y = (1 + i / length * 0.55) * self.size
+
+        x = self.pos2[0] - (size_x - self.size) / 2 + 0.5
+        y = self.pos2[1] - (size_y - self.size) / 2 + 0.5
+
+        self.not_look()
+        self.looking = c.create_oval(
+            x, y, x + size_x + 0.5, y + size_y + 0.5, fill='white', outline='white'
+        )
+
+    def not_look(self):
+        if self.looking is not None:
+            deleteObject(self.looking)
+            self.looking = None
+
 
 def html_col(col):
     r, g, b = col
@@ -128,6 +172,8 @@ def create_ufo():
         ))
 
 def create_dodik():
+    global eye1, eye2
+
     body = (513, 761, 513 + 54, 761 + 117)
     c.create_oval(*body, fill='#dde9af', outline='#dde9af')
 
@@ -206,8 +252,14 @@ def create_dodik():
     c.create_oval(514, 691, 514 + 35, 691 + 33, fill='black', outline='black')
     c.create_oval(570, 698, 570 + 24, 698 + 26, fill='black', outline='black')
 
-    c.create_oval(531, 708, 531 + 9, 708 + 8, fill='white', outline='white')
-    c.create_oval(581, 711, 581 + 7, 711 + 7, fill='white', outline='white')
+    eye1 = Eye(c.create_oval(
+        531, 708, 531 + 9, 708 + 8, fill='white', outline='white'),
+        (514 + (35 - 9) // 2, 691 + (33 - 8) // 2), 9.5
+    )
+    eye2 = Eye(c.create_oval(
+        581, 711, 581 + 7, 711 + 7, fill='white', outline='white'),
+        (570 + (24 - 7) // 2, 698 + (26 - 7) // 2), 7
+    )
 
 def create_apple():
     c.create_oval(620, 751, 620 + 55, 751 + 53, fill='#c83737', outline='#c83737')
@@ -282,11 +334,8 @@ per = int(1 / fps / 2)
 v = 0
 a = 0
 
-def animation():
-    global i, v, a
-
-    i += 1
-    i %= 15 * per
+def animate_ufo(i):
+    global v, a
 
     dy = v + a // 2
     v += a
@@ -294,20 +343,7 @@ def animation():
     for obj in ufo.content:
         moveObjectBy(obj, 0, -dy)
 
-    if i // per == 7:
-        turn_off_ray(i - 7 * per)
-
-    elif i == 8 * per:
-        changeFillColor(ray.top, html_col(sky_col))
-        changePenColor(ray.top, html_col(sky_col))
-
-        changeFillColor(ray.horizon, html_col(horizon_col))
-        changePenColor(ray.horizon, html_col(horizon_col))
-
-        changeFillColor(ray.down, html_col(ground_col))
-        changePenColor(ray.down, html_col(ground_col))
-
-    elif i // per == 9:
+    if i // per == 9:
         a = 3
 
     elif i == 11 * per:
@@ -323,12 +359,63 @@ def animation():
         create_ufo()
 
 
+def animate_ray(i):
+    if i // per == 7:
+        j = i - 7 * per
+        turn_off_ray(j)
+
+    elif i == 8 * per:
+        changeFillColor(ray.top, html_col(sky_col))
+        changePenColor(ray.top, html_col(sky_col))
+
+        changeFillColor(ray.horizon, html_col(horizon_col))
+        changePenColor(ray.horizon, html_col(horizon_col))
+
+        changeFillColor(ray.down, html_col(ground_col))
+        changePenColor(ray.down, html_col(ground_col))
+
     elif i // per == 14:
         turn_on_ray(i - 14 * per)
 
 
+def animate_eyes(i):
+    if 10 * per <= i < 10.5 * per:
+        j = int(i - 10 * per)
+        eye1.move(1, j, per // 2)
+        eye2.move(1, j, per // 2)
+
+    if 11 * per == i:
+        eye1.take_pos2()
+        eye2.take_pos2()
+
+    if 11 * per <= i < 11.125 * per:
+        eye1.look(i - 11 * per, per / 8)
+        eye2.look(i - 11 * per, per / 8)
 
 
+    if 29 * per == 2 * i:
+        eye1.not_look()
+        eye2.not_look()
+
+    if 14.5 * per <= i:
+        j = int(i - 14.5 * per)
+
+        eye1.move(-1, j, per // 2)
+        eye2.move(-1, j, per // 2)
+    if i == 0:
+        eye1.take_pos1()
+        eye2.take_pos1()
+
+
+def animation():
+    global i
+
+    i += 1
+    i %= 15 * per
+
+    animate_ufo(i)
+    animate_ray(i)
+    animate_eyes(i)
 
 
 
