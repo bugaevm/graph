@@ -1,5 +1,4 @@
 from graph import *
-from time import sleep
 
 c = canvas()
 
@@ -66,6 +65,8 @@ class Eye:
             self.looking = None
 
 
+
+
 def html_col(col):
     r, g, b = col
 
@@ -84,7 +85,6 @@ def create_background():
 
     brushColor(ground_col)
     rectangle(-1, 576 + 1, width + 1, height + 1)
-
 
 def create_sun():
     penColor('#f2f2f2')
@@ -111,7 +111,6 @@ def create_clouds():
 
     for cloud in dark:
         c.create_oval(*cloud, fill='#333333', outline='#333333')
-
 
 def create_ray():
     global ray
