@@ -15,11 +15,11 @@ cloud_list = []  # list of clouds characteristics
 
 
 def fog_generation():  # func generate cloud_number fog clouds
-    global cloud_number, cloud_list
+    global  cloud_number
     for i in range(cloud_number):
 
         # generation of cloud characteristics
-        cloud_speed = r.randint(0, 14)
+        cloud_speed = r.randint(1, 5)
         cloud_length = r.randint(50, 200)
         cloud_x = r.randint(100, 500)
         cloud_y = r.randint(50, 450)
@@ -33,21 +33,19 @@ def fog_generation():  # func generate cloud_number fog clouds
         penColor(red, green, blue)
         penSize(15)
         cloud = line(cloud_x, cloud_y, cloud_x + cloud_length, cloud_y)
-        cloud_list.append([cloud, cloud_speed, cloud_length])
+        cloud_list.append([cloud, cloud_speed, cloud_length, cloud_y])
 
 
 def fog_animation():  # func animate fog
     for i in range(cloud_number):
-        pass
+        moveObjectBy(cloud_list[i][0], cloud_list[i][1], 0)
+        if xCoord(cloud_list[i][0]) > width:
+            print (i)
+            cloud_y = r.randint(50, 450)
+            moveObjectTo(cloud_list[i][0], -cloud_list[i][2], cloud_y)
 
 
-def fog():  # main func
-    global cloud_number
-    cloud_number = r.randint(8, 15)
-    fog_generation()
-    fog_animation()
-    return 0
-
-
-fog()
+cloud_number = r.randint(8, 15)
+fog_generation()
+onTimer(fog_animation, 10)
 run()
