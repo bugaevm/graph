@@ -1,0 +1,2 @@
+an exlanation of program fog.py
+#this file has been made for fun#
