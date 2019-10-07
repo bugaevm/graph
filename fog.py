@@ -1,5 +1,4 @@
 from graph import *
-from tkinter import *
 import random as r
 
 c = canvas()

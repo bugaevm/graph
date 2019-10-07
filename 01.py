@@ -1,4 +1,5 @@
 from graph import *
+import random as r
 
 c = canvas()
 
@@ -9,16 +10,20 @@ windowSize(width, height)
 canvasSize(width, height)
 
 fps = 1 / 60
+cloud_list = []  # list of clouds characteristics
+
 
 class UFO:
     def __init__(self, *args):
         self.content = list(args)
+
 
 class Ray:
     def __init__(self, down, horizon, top):
         self.top = top
         self.horizon = horizon
         self.down = down
+
 
 class Eye:
     def __init__(self, obj, pos2, size):
@@ -37,9 +42,9 @@ class Eye:
         # )
 
         moveObjectBy(self.obj,
-            v * (self.pos2[0] - self.pos1[0]) / length,
-            v * (self.pos2[1] - self.pos1[1]) / length,
-        )
+                     v * (self.pos2[0] - self.pos1[0]) / length,
+                     v * (self.pos2[1] - self.pos1[1]) / length,
+                     )
 
     def take_pos1(self):
         moveObjectTo(self.obj, *self.pos1)
@@ -65,8 +70,6 @@ class Eye:
             self.looking = None
 
 
-
-
 def html_col(col):
     r, g, b = col
 
@@ -75,6 +78,7 @@ def html_col(col):
     b = ('0' + hex(b)[2:])[-2:]
 
     return '#' + r + g + b
+
 
 def create_background():
     penColor(horizon_col)
@@ -86,11 +90,13 @@ def create_background():
     brushColor(ground_col)
     rectangle(-1, 576 + 1, width + 1, height + 1)
 
+
 def create_sun():
     penColor('#f2f2f2')
     brushColor('#f2f2f2')
 
     circle((631 + 383) // 2, (127 + 370) // 2, (631 - 383) // 2)
+
 
 def create_clouds():
     light = list()
@@ -112,6 +118,7 @@ def create_clouds():
     for cloud in dark:
         c.create_oval(*cloud, fill='#333333', outline='#333333')
 
+
 def create_ray():
     global ray
 
@@ -128,7 +135,6 @@ def create_ray():
     top.append((214, 508))
     top.append((128, 507))
 
-
     penColor(ray_ground_col)
     brushColor(ray_ground_col)
     r_down = polygon(down)
@@ -142,6 +148,7 @@ def create_ray():
     r_hor = polygon([(94, 576), (253, 576), (254, 577), (93, 577)])
 
     ray = Ray(r_down, r_hor, r_top)
+
 
 def create_ufo():
     global ufo
@@ -169,6 +176,7 @@ def create_ufo():
         ufo.content.append(c.create_oval(
             *window, fill='#ffffff', outline='#ffffff'
         ))
+
 
 def create_dodik():
     global eye1, eye2
@@ -206,14 +214,12 @@ def create_dodik():
 
     head_outline = [(507, 709)] + head + [(496, 692)]
 
-
     penColor('#dde9af')
     brushColor('#dde9af')
     polygon(head)
 
     penColor('#090a06')
     polyline(head_outline)
-
 
     ovals = list()
 
@@ -244,7 +250,6 @@ def create_dodik():
     ovals.append((558, 887, 558 + 21, 887 + 48))
     ovals.append((575, 915, 575 + 28, 915 + 27))
 
-
     for oval in ovals:
         c.create_oval(*oval, fill='#dde9af', outline='#dde9af')
 
@@ -259,6 +264,7 @@ def create_dodik():
         581, 711, 581 + 7, 711 + 7, fill='white', outline='white'),
         (570 + (24 - 7) // 2, 698 + (26 - 7) // 2), 7
     )
+
 
 def create_apple():
     c.create_oval(620, 751, 620 + 55, 751 + 53, fill='#c83737', outline='#c83737')
@@ -299,13 +305,14 @@ def change_col(col1, col2, i, length):
     return html_col((r, g, b))
 
 
-sky_col = (0, 34, 43)  #00222b
-horizon_col = (46, 69, 68)  #2e4544
-ground_col = (34, 43, 0)  #222b00
+sky_col = (0, 34, 43)  # 00222b
+horizon_col = (46, 69, 68)  # 2e4544
+ground_col = (34, 43, 0)  # 222b00
 
-ray_sky_col = (106, 125, 131)  #6a7d83
-ray_horizon_col = (132, 146, 145)  #849291
-ray_ground_col = (125, 131, 106)  #7d836a
+ray_sky_col = (106, 125, 131)  # 6a7d83
+ray_horizon_col = (132, 146, 145)  # 849291
+ray_ground_col = (125, 131, 106)  # 7d836a
+
 
 def turn_off_ray(j):
     changeFillColor(ray.top, change_col(ray_sky_col, sky_col, j, per))
@@ -317,6 +324,7 @@ def turn_off_ray(j):
     changeFillColor(ray.down, change_col(ray_ground_col, ground_col, j, per))
     changePenColor(ray.down, change_col(ray_ground_col, ground_col, j, per))
 
+
 def turn_on_ray(j):
     changeFillColor(ray.top, change_col(sky_col, ray_sky_col, j, per))
     changePenColor(ray.top, change_col(sky_col, ray_sky_col, j, per))
@@ -327,11 +335,13 @@ def turn_on_ray(j):
     changeFillColor(ray.down, change_col(ground_col, ray_ground_col, j, per))
     changePenColor(ray.down, change_col(ground_col, ray_ground_col, j, per))
 
+
 i = 0
 per = int(1 / fps / 2)
 
 v = 0
 a = 0
+
 
 def animate_ufo(i):
     global v, a
@@ -391,7 +401,6 @@ def animate_eyes(i):
         eye1.look(i - 11 * per, per / 8)
         eye2.look(i - 11 * per, per / 8)
 
-
     if 29 * per == 2 * i:
         eye1.not_look()
         eye2.not_look()
@@ -417,6 +426,32 @@ def animation():
     animate_eyes(i)
 
 
+def fog_generation():  # func generate cloud_number fog clouds
+    global cloud_number
+    for i in range(cloud_number):
+        # generation of cloud characteristics
+        cloud_speed = r.randint(1, 5)
+        cloud_length = r.randint(50, 200)
+        cloud_x = r.randint(100, 500)
+        cloud_y = r.randint(700, 1050)
+
+        # cloud color generation
+        grey = r.randint(150, 255)
+
+        # cloud drawing
+        penColor(grey, grey, grey)
+        penSize(25)
+        cloud = line(cloud_x, cloud_y, cloud_x + cloud_length, cloud_y)
+        cloud_list.append([cloud, cloud_speed, cloud_length, cloud_y])
+
+
+def fog_animation():  # func animate fog
+    for i in range(cloud_number):
+        moveObjectBy(cloud_list[i][0], cloud_list[i][1], 0)
+        if xCoord(cloud_list[i][0]) > width:
+            cloud_y = r.randint(700, 1050)
+            moveObjectTo(cloud_list[i][0], -cloud_list[i][2], cloud_y)
+
 
 create_background()
 create_sun()
@@ -426,7 +461,10 @@ create_ufo()
 create_dodik()
 create_apple()
 
-onTimer(animation, int(fps * 1000))
+cloud_number = r.randint(8, 15)
+fog_generation()
+onTimer(fog_animation, 10)
 
+onTimer(animation, int(fps * 1000))
 
 run()
