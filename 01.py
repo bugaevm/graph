@@ -433,23 +433,23 @@ def fog_generation():  # func generate cloud_number fog clouds
         cloud_speed = r.randint(1, 5)
         cloud_length = r.randint(50, 200)
         cloud_x = r.randint(100, 500)
-        cloud_y = r.randint(700, 1050)
+        cloud_y = r.randint(100, 1050)
 
         # cloud color generation
-        grey = r.randint(150, 255)
+        grey = r.randint(120, 215)
 
         # cloud drawing
         penColor(grey, grey, grey)
         penSize(25)
         cloud = line(cloud_x, cloud_y, cloud_x + cloud_length, cloud_y)
-        cloud_list.append([cloud, cloud_speed, cloud_length, cloud_y])
+        cloud_list.append([cloud, cloud_speed, cloud_length])
 
 
 def fog_animation():  # func animate fog
     for i in range(cloud_number):
         moveObjectBy(cloud_list[i][0], cloud_list[i][1], 0)
         if xCoord(cloud_list[i][0]) > width:
-            cloud_y = r.randint(700, 1050)
+            cloud_y = r.randint(100, 1050)
             moveObjectTo(cloud_list[i][0], -cloud_list[i][2], cloud_y)
 
 
@@ -461,10 +461,9 @@ create_ufo()
 create_dodik()
 create_apple()
 
-cloud_number = r.randint(8, 15)
+cloud_number = r.randint(50, 75)
 fog_generation()
 onTimer(fog_animation, 10)
-
 onTimer(animation, int(fps * 1000))
 
 run()

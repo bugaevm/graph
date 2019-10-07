@@ -39,7 +39,6 @@ def fog_animation():  # func animate fog
     for i in range(cloud_number):
         moveObjectBy(cloud_list[i][0], cloud_list[i][1], 0)
         if xCoord(cloud_list[i][0]) > width:
-            print (i)
             cloud_y = r.randint(50, 450)
             moveObjectTo(cloud_list[i][0], -cloud_list[i][2], cloud_y)
 
